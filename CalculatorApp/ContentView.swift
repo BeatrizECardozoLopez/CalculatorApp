@@ -45,7 +45,7 @@ struct ContentView: View {
     }
 }
 
-////Estructura de la fila de botones
+
 struct ButtonRow: View {
 
     // Variables
@@ -55,9 +55,7 @@ struct ButtonRow: View {
     var body: some View {
         HStack(spacing: 12){
             ForEach(Array(textButton.enumerated()), id: \.1) {index, buttonTitle in
-                Button {
-                    // TODO: functionality
-                } label: {
+                Button {} label: {
                     Text(buttonTitle)
                 }.buttonStyle(GradientButtonStyle(color: colors[index]))
             }
