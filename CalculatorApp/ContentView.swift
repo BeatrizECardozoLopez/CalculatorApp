@@ -15,8 +15,9 @@ struct ContentView: View {
     var LightGray: Color = Color("LightGray")
     
     
-    //Variables de Estado: faltan!
+    //Variables de Estado
     @State private var displayText = "0"
+    @State private var selectedItem = ""
     
     var body: some View {
         VStack (alignment: .trailing, spacing: 18) {
@@ -30,12 +31,31 @@ struct ContentView: View {
                 .padding(.top, 100)
             
             //BOTONES
-            ButtonRow(textButton: ["AC", "+/-", "%", "÷"], colors: [LightGray, LightGray, LightGray, Orange])
-            ButtonRow(textButton: ["7", "8", "9", "x"], colors: [DarkGray, DarkGray, DarkGray, Orange])
-            ButtonRow(textButton: ["4", "5", "6", "-"], colors: [DarkGray, DarkGray, DarkGray, Orange])
-            ButtonRow(textButton: ["1", "2", "3", "+"], colors: [DarkGray, DarkGray, DarkGray, Orange])
-            ButtonRow(textButton: ["", "0", ",", "="], colors: [DarkGray, DarkGray, DarkGray, Orange])
+            MainButtonRow(textButton: ["AC", "+/-", "%", "÷"], colors: [LightGray, LightGray, LightGray, Orange], textColors: [.black, .black, .black, .white], selectedItem: $selectedItem)
+            MainButtonRow(textButton: ["7", "8", "9", "x"], colors: [DarkGray, DarkGray, DarkGray, Orange], selectedItem: $selectedItem)
+            MainButtonRow(textButton: ["4", "5", "6", "-"], colors: [DarkGray, DarkGray, DarkGray, Orange], selectedItem: $selectedItem)
+            MainButtonRow(textButton: ["1", "2", "3", "+"], colors: [DarkGray, DarkGray, DarkGray, Orange], selectedItem: $selectedItem)
             
+            //HStack to get a wide zero button
+            HStack (spacing: 18){
+                Button {
+                    self.selectedItem = "0"
+                } label: {
+                    HStack {
+                        Text("0")
+                        Spacer()
+                    }.padding(.horizontal, 15)
+                }
+                .padding()
+                .frame(width:  175, height:  (UIScreen.main.bounds.width - 5 * 12) / 4)
+                .font(.system(size: 33, design: .rounded))
+                .fontWeight(.medium)
+                .background(DarkGray)
+                .foregroundStyle(.white)
+                .cornerRadius(40)
+  
+                MainButtonRow(textButton: [",", "="], colors: [DarkGray, Orange], selectedItem:  $selectedItem)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
@@ -46,27 +66,33 @@ struct ContentView: View {
 }
 
 
-struct ButtonRow: View {
+struct MainButtonRow: View {
 
     // Variables
     var textButton: [String]
     var colors: [Color]
+    var textColors: [Color]? //Optional array, just used on first line to change between black and white
+    
+    @Binding var selectedItem: String
 
     var body: some View {
         HStack(spacing: 12){
             ForEach(Array(textButton.enumerated()), id: \.1) {index, buttonTitle in
-                Button {} label: {
+                Button {
+                    self.selectedItem = buttonTitle
+                } label: {
                     Text(buttonTitle)
-                }.buttonStyle(GradientButtonStyle(color: colors[index]))
+                }.buttonStyle(MainButtonStyle(color: colors[index], textColor: textColors?[index]))
             }
         }
     }
 }
 
 
-struct GradientButtonStyle: ButtonStyle {
+struct MainButtonStyle: ButtonStyle {
     //Variables
     var color: Color
+    var textColor: Color? //Optional value
     let buttonSize = (UIScreen.main.bounds.width - 5 * 12) / 4
     
     func makeBody(configuration: Configuration) -> some View {
@@ -75,7 +101,7 @@ struct GradientButtonStyle: ButtonStyle {
             .font(.system(size: 33, design: .rounded))
             .fontWeight(.medium)
             .background(color)
-            .foregroundStyle(.white)
+            .foregroundStyle(textColor ?? .white) //Used in case there is no value asigned to textColor, default is white
             .clipShape(Circle())
     }
 }
